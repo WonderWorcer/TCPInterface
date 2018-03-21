@@ -40,8 +40,8 @@
             </items>
         </TableView>
       <Button mnemonicParsing="false" onAction="#addAllData" prefHeight="15.0" prefWidth="63.0" text="Get Data" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-      <TextField fx:id="ipAdress" onAction="#addAllData" prefHeight="25.0" prefWidth="17.0" GridPane.rowIndex="1" />
-      <TextField fx:id="port" onAction="#addAllData" prefHeight="25.0" prefWidth="143.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <TextField fx:id="ipAdress" onAction="#addAllData" prefHeight="25.0" prefWidth="17.0" promptText="ip" GridPane.rowIndex="1" />
+      <TextField fx:id="port" onAction="#addAllData" prefHeight="25.0" prefWidth="143.0" promptText="port" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
 
     </children>
