@@ -1,8 +1,3 @@
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Vector;
-
-import net.wimpi.modbus.Modbus;
 import net.wimpi.modbus.ModbusException;
 import net.wimpi.modbus.io.ModbusTCPTransaction;
 import net.wimpi.modbus.msg.ReadInputDiscretesRequest;
@@ -12,6 +7,10 @@ import net.wimpi.modbus.msg.ReadInputRegistersResponse;
 import net.wimpi.modbus.net.TCPMasterConnection;
 import net.wimpi.modbus.procimg.InputRegister;
 import net.wimpi.modbus.util.BitVector;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Vector;
 
 public class ModbusTCP {
 
@@ -53,7 +52,7 @@ public class ModbusTCP {
 
     public Vector getModbusData(){
 
-        Vector<FlagData> dateFromModbus = new Vector<FlagData>();
+        Vector<FlagData> dateFromModbus = new Vector<>();
         InetAddress connectionAddress = null; //127.0.0.1
         try {
             connectionAddress = InetAddress.getByName(ip);
@@ -94,27 +93,26 @@ public class ModbusTCP {
         int analogAddIndex = 0;
         int requestIndex = 0;
         try {
-
             transactionFC4.execute();
             responseFC4 = (ReadInputRegistersResponse)transactionFC4.getResponse();
 
             for (InputRegister register : responseFC4.getRegisters()) {
-                dateFromModbus.add(new FlagData(String.valueOf(offsetFC4 + analogAddIndex),"",String.valueOf(register.getValue())));
+                dateFromModbus.add(new FlagData(String.valueOf(offsetFC4 + analogAddIndex),
+                        new StringBuilder(String.format("0x%04X", register.getValue() & 0xFFFF))
+                                .append(" (")
+                                .append(register.getValue())
+                                .append(")").toString()));
                 analogAddIndex++;
             }
-
-
 
             transactionFC2.execute();
             responseFC2 = (ReadInputDiscretesResponse)transactionFC2.getResponse();
             BitVector discreteInputs = responseFC2.getDiscretes();
             for(int i = 0; i< discreteInputs.size(); i++){
-                dateFromModbus.add(new FlagData(String.valueOf(offsetFC2 + i),"",String.valueOf(discreteInputs.getBit(i))));
+                dateFromModbus.add(new FlagData(String.valueOf(offsetFC2 + i), discreteInputs.getBit(i) == true ? "1" : "0"));
             }
 
             requestIndex++;
-
-
 
         } catch (ModbusException ex) {
             connection.close();

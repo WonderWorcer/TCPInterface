@@ -14,7 +14,9 @@ public class Main extends Application {
     public void start(Stage primaryStage)throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("fxmlMainWindow.fxml"));
         primaryStage.setTitle("Modbus TCP/IP Interface");
-        primaryStage.setScene(new Scene(root, 600, 500));
+        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setResizable(false);
+        primaryStage.sizeToScene();
         primaryStage.show();
     }
 }

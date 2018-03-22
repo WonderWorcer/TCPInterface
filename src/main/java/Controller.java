@@ -4,42 +4,34 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
 public class Controller implements Initializable {
+    @FXML
+    private TableView<FlagData> tableView;
 
-    @FXML private TableView<FlagData> tableView;
-    @FXML private TextField nameFlag;
-    @FXML private TextField adress;
-    @FXML private TextField value;
-
-    @FXML private TextField ipAdress;
-    @FXML private TextField port;
+    @FXML
+    private TextField ipAddress;
+    @FXML
+    private TextField port;
 
     public void addAllData(ActionEvent event){
         ObservableList<FlagData> data = tableView.getItems();
         data.clear();
-        Vector<FlagData> dataFromModbus = new Vector<FlagData>();
-        ModbusTCP modbusTCP = new ModbusTCP(ipAdress.getText(),Integer.parseInt(port.getText()));
-        dataFromModbus = modbusTCP.getModbusData();
+        ModbusTCP modbusTCP = new ModbusTCP(ipAddress.getText(), Integer.parseInt(port.getText()));
+        Vector<FlagData> dataFromModbus = modbusTCP.getModbusData();
 
         for(int i = 0; i < dataFromModbus.size(); i++){
             data.add(dataFromModbus.elementAt(i));
         }
-
-
-    }
-
-    public void pressButton(ActionEvent event){
-        System.out.println("Hello world");
-
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
     }
 }

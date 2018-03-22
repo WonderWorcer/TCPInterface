@@ -1,34 +1,20 @@
 import javafx.beans.property.SimpleStringProperty;
+
 public class FlagData {
-
-
-    private final SimpleStringProperty flagName = new SimpleStringProperty("");
-    private final SimpleStringProperty adress = new SimpleStringProperty("");
+    private final SimpleStringProperty address = new SimpleStringProperty("");
     private final SimpleStringProperty value = new SimpleStringProperty("");
 
-    public FlagData() {
-        this("", "", "");
-    }
-    public FlagData(String flagName, String adress, String value) {
-        setFlagName(flagName);
-        setAdress(adress);
+    public FlagData(String address, String value) {
+        setAddress(address);
         setValue(value);
     }
 
-    public String getFlagName() {
-        return flagName.get();
+    public String getAddress() {
+        return address.get();
     }
 
-    public void setFlagName(String fName) {
-        flagName.set(fName);
-    }
-
-    public String getAdress() {
-        return adress.get();
-    }
-
-    public void setAdress(String fName) {
-        adress.set(fName);
+    public void setAddress(String fName) {
+        address.set(fName);
     }
 
     public String getValue() {
