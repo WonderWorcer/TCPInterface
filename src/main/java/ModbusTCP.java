@@ -20,11 +20,15 @@ public class ModbusTCP {
 
     //Request/response for input statuses (discrete inputs) (FC02)
     private static ReadInputDiscretesRequest requestFC2 = null;
+
     private static ReadInputDiscretesResponse responseFC2 = null;
 
     //Request/response for analog input registers (FC04)
     private static ReadInputRegistersRequest requestFC4 = null;
     private static ReadInputRegistersResponse responseFC4 = null;
+
+    private static ReadMultipleRegistersRequest request = null;
+    private static ReadMultipleRegistersResponse response = null;
 
     private static WriteSingleRegisterRequest commonRequest = null;
     private static WriteSingleRegisterResponse commonResponse = null;
@@ -338,7 +342,64 @@ public class ModbusTCP {
      * @param logicalNumber - Логический номер устройства
      */
     public void setLogRequest(int serialNumber,int logicalNumber){
+        InetAddress connectionAddress = null; //127.0.0.1
+        try {
+            connectionAddress = InetAddress.getByName(ip);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        int connectionPort = port; //502
+        try {
+            connection = new TCPMasterConnection(connectionAddress);
+            connection.setPort(connectionPort);
+            connection.connect();
+        } catch (Exception ex) {
+            System.out.println(new StringBuilder("ERROR: Could not establish connection to slave device. Device address: ")
+                    .append(connectionAddress.getHostAddress())
+                    .append(':')
+                    .append(connectionPort));
+            connection.close();
+            return;
+        }
 
+        int offset = 40001;
+        int countReg = 2;
+
+        request = new ReadMultipleRegistersRequest(offset, countReg);
+        commonTransaction = new ModbusTCPTransaction(connection);
+        commonTransaction.setRequest(request);
+
+        String fullSerialNumber = "";
+        try {
+            commonTransaction.execute();
+            response = (ReadMultipleRegistersResponse)commonTransaction.getResponse();
+
+            for (InputRegister register : response.getRegisters()) {
+             fullSerialNumber+= register.getValue();
+            }
+            int resultSerialNumber = Integer.valueOf(fullSerialNumber,16);
+            if(resultSerialNumber == serialNumber)
+            {
+                SimpleRegister reg = new SimpleRegister(1);
+                int offsetFC4 = 40003;
+                reg.setValue(logicalNumber);
+                commonRequest = new WriteSingleRegisterRequest(offsetFC4,reg);
+                commonTransaction = new ModbusTCPTransaction(connection);
+                commonTransaction.setRequest(commonRequest);
+                try {
+                    commonTransaction.execute();
+                    commonResponse =  (WriteSingleRegisterResponse) commonTransaction.getResponse();
+                } catch (ModbusException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        } catch (ModbusException ex) {
+            connection.close();
+        }
+
+        //Close connection
+        connection.close();
 
 
     }
