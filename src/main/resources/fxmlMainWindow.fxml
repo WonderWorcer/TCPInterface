@@ -54,7 +54,7 @@
                         </FXCollections>
                     </items>
                 </TableView>
-                <Button minHeight="30.0" mnemonicParsing="false" onAction="#addAllData" text="Подключиться" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                <Button minHeight="30.0" mnemonicParsing="false" onAction="#setLogRequest" text="Подключиться" GridPane.columnIndex="2" GridPane.rowIndex="1">
                     <font>
                         <Font size="14.0" />
                     </font></Button>

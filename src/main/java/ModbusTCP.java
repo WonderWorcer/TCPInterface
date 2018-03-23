@@ -1,11 +1,9 @@
 import net.wimpi.modbus.ModbusException;
 import net.wimpi.modbus.io.ModbusTCPTransaction;
-import net.wimpi.modbus.msg.ReadInputDiscretesRequest;
-import net.wimpi.modbus.msg.ReadInputDiscretesResponse;
-import net.wimpi.modbus.msg.ReadInputRegistersRequest;
-import net.wimpi.modbus.msg.ReadInputRegistersResponse;
+import net.wimpi.modbus.msg.*;
 import net.wimpi.modbus.net.TCPMasterConnection;
 import net.wimpi.modbus.procimg.InputRegister;
+import net.wimpi.modbus.procimg.SimpleRegister;
 import net.wimpi.modbus.util.BitVector;
 
 import java.net.InetAddress;
@@ -17,6 +15,8 @@ public class ModbusTCP {
     private static TCPMasterConnection connection = null;
     private static ModbusTCPTransaction transactionFC2 = null;
     private static ModbusTCPTransaction transactionFC4 = null;
+    private static ModbusTCPTransaction commonTransaction = null;
+
 
     //Request/response for input statuses (discrete inputs) (FC02)
     private static ReadInputDiscretesRequest requestFC2 = null;
@@ -25,6 +25,10 @@ public class ModbusTCP {
     //Request/response for analog input registers (FC04)
     private static ReadInputRegistersRequest requestFC4 = null;
     private static ReadInputRegistersResponse responseFC4 = null;
+
+    private static WriteSingleRegisterRequest commonRequest = null;
+    private static WriteSingleRegisterResponse commonResponse = null;
+
     String ip;
 
     public ModbusTCP(String ip, int port) {
@@ -121,6 +125,222 @@ public class ModbusTCP {
         //Close connection
         connection.close();
         return dateFromModbus;
+    }
+
+
+    /**
+     * SETPREPTUTIME_REQUEST
+     * @param time - Время в мс
+     */
+    public void setPrepTuTimeRequest(int time){
+        SimpleRegister reg = new SimpleRegister(1);
+        InetAddress connectionAddress = null; //127.0.0.1
+        try {
+            connectionAddress = InetAddress.getByName(ip);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        int connectionPort = port; //502
+        try {
+            connection = new TCPMasterConnection(connectionAddress);
+            connection.setPort(connectionPort);
+            connection.connect();
+        } catch (Exception ex) {
+            System.out.println(new StringBuilder("ERROR: Could not establish connection to slave device. Device address: ")
+                    .append(connectionAddress.getHostAddress())
+                    .append(':')
+                    .append(connectionPort));
+            connection.close();
+            return ;
+        }
+
+        int offsetFC4 = 40008;
+        reg.setValue(time);
+        commonRequest = new WriteSingleRegisterRequest(offsetFC4,reg);
+        commonTransaction = new ModbusTCPTransaction(connection);
+        commonTransaction.setRequest(commonRequest);
+
+        try {
+            commonTransaction.execute();
+            commonResponse =  (WriteSingleRegisterResponse) commonTransaction.getResponse();
+        } catch (ModbusException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * SETPREPTCTIME_REQUEST
+     * @param time - Время в мс
+     */
+    public void setPrepTcTimeRequest(int time){
+        SimpleRegister reg = new SimpleRegister(1);
+        InetAddress connectionAddress = null; //127.0.0.1
+        try {
+            connectionAddress = InetAddress.getByName(ip);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        int connectionPort = port; //502
+        try {
+            connection = new TCPMasterConnection(connectionAddress);
+            connection.setPort(connectionPort);
+            connection.connect();
+        } catch (Exception ex) {
+            System.out.println(new StringBuilder("ERROR: Could not establish connection to slave device. Device address: ")
+                    .append(connectionAddress.getHostAddress())
+                    .append(':')
+                    .append(connectionPort));
+            connection.close();
+            return ;
+        }
+
+        int offsetFC4 = 40007;
+        reg.setValue(time);
+        commonRequest = new WriteSingleRegisterRequest(offsetFC4,reg);
+        commonTransaction = new ModbusTCPTransaction(connection);
+        commonTransaction.setRequest(commonRequest);
+
+        try {
+            commonTransaction.execute();
+            commonResponse =  (WriteSingleRegisterResponse) commonTransaction.getResponse();
+        } catch (ModbusException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * SETPREPAUTOTIME_REQUEST
+     * @param time - Время в мс
+     */
+    public void setPrepAutoTimeRequest(int time){
+        SimpleRegister reg = new SimpleRegister(1);
+        InetAddress connectionAddress = null; //127.0.0.1
+        try {
+            connectionAddress = InetAddress.getByName(ip);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        int connectionPort = port; //502
+        try {
+            connection = new TCPMasterConnection(connectionAddress);
+            connection.setPort(connectionPort);
+            connection.connect();
+        } catch (Exception ex) {
+            System.out.println(new StringBuilder("ERROR: Could not establish connection to slave device. Device address: ")
+                    .append(connectionAddress.getHostAddress())
+                    .append(':')
+                    .append(connectionPort));
+            connection.close();
+            return ;
+        }
+
+        int offsetFC4 = 40006;
+        reg.setValue(time);
+        commonRequest = new WriteSingleRegisterRequest(offsetFC4,reg);
+        commonTransaction = new ModbusTCPTransaction(connection);
+        commonTransaction.setRequest(commonRequest);
+
+        try {
+            commonTransaction.execute();
+            commonResponse =  (WriteSingleRegisterResponse) commonTransaction.getResponse();
+        } catch (ModbusException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * SETRTSTIME_REQUEST
+     * @param time - Время в мс
+     */
+    public void setRstTimeRequest(int time){
+        SimpleRegister reg = new SimpleRegister(1);
+        InetAddress connectionAddress = null; //127.0.0.1
+        try {
+            connectionAddress = InetAddress.getByName(ip);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        int connectionPort = port; //502
+        try {
+            connection = new TCPMasterConnection(connectionAddress);
+            connection.setPort(connectionPort);
+            connection.connect();
+        } catch (Exception ex) {
+            System.out.println(new StringBuilder("ERROR: Could not establish connection to slave device. Device address: ")
+                    .append(connectionAddress.getHostAddress())
+                    .append(':')
+                    .append(connectionPort));
+            connection.close();
+            return ;
+        }
+
+        int offsetFC4 = 40005;
+        reg.setValue(time);
+        commonRequest = new WriteSingleRegisterRequest(offsetFC4,reg);
+        commonTransaction = new ModbusTCPTransaction(connection);
+        commonTransaction.setRequest(commonRequest);
+
+        try {
+            commonTransaction.execute();
+            commonResponse =  (WriteSingleRegisterResponse) commonTransaction.getResponse();
+        } catch (ModbusException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * SETANSWERTIME_REQUEST
+     * @param time - Время в мс
+     */
+    public void setAnswerTimeRequest(int time){
+        SimpleRegister reg = new SimpleRegister(1);
+        InetAddress connectionAddress = null; //127.0.0.1
+        try {
+            connectionAddress = InetAddress.getByName(ip);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        int connectionPort = port; //502
+        try {
+            connection = new TCPMasterConnection(connectionAddress);
+            connection.setPort(connectionPort);
+            connection.connect();
+        } catch (Exception ex) {
+            System.out.println(new StringBuilder("ERROR: Could not establish connection to slave device. Device address: ")
+                    .append(connectionAddress.getHostAddress())
+                    .append(':')
+                    .append(connectionPort));
+            connection.close();
+            return ;
+        }
+
+        int offsetFC4 = 40004;
+        reg.setValue(time);
+        commonRequest = new WriteSingleRegisterRequest(offsetFC4,reg);
+        commonTransaction = new ModbusTCPTransaction(connection);
+        commonTransaction.setRequest(commonRequest);
+
+        try {
+            commonTransaction.execute();
+            commonResponse =  (WriteSingleRegisterResponse) commonTransaction.getResponse();
+        } catch (ModbusException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * SETLOG_REQUEST
+     * @param serialNumber - Серийный номер устройства
+     * @param logicalNumber - Логический номер устройства
+     */
+    public void setLogRequest(int serialNumber,int logicalNumber){
+
+
+
     }
 
 }
