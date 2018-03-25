@@ -15,6 +15,7 @@ public class ModbusTCP {
     private static TCPMasterConnection connection = null;
     private static ModbusTCPTransaction transactionFC2 = null;
     private static ModbusTCPTransaction transactionFC4 = null;
+    private static ModbusTCPTransaction transactionFC3 = null;
     private static ModbusTCPTransaction commonTransaction = null;
 
 
@@ -26,6 +27,10 @@ public class ModbusTCP {
     //Request/response for analog input registers (FC04)
     private static ReadInputRegistersRequest requestFC4 = null;
     private static ReadInputRegistersResponse responseFC4 = null;
+
+    //Request/response for analog output holding registers (FC03)
+    private static ReadMultipleRegistersRequest requestFC3 = null;
+    private static ReadMultipleRegistersResponse responseFC3 = null;
 
     private static ReadMultipleRegistersRequest request = null;
     private static ReadMultipleRegistersResponse response = null;
@@ -91,14 +96,22 @@ public class ModbusTCP {
         int countFC2 = 24;
         requestFC2 = new ReadInputDiscretesRequest(offsetFC2, countFC2);
 
+        //Read 8 analog output holding registers starting from 40001
+        int offsetFC3 = 40001;
+        int countFC3 = 8;
+        requestFC3 = new ReadMultipleRegistersRequest(offsetFC3, countFC3);
+
         //Create request transactions
         transactionFC2 = new ModbusTCPTransaction(connection);
         transactionFC4 = new ModbusTCPTransaction(connection);
+        transactionFC3 = new ModbusTCPTransaction(connection);
         transactionFC2.setRequest(requestFC2);
         transactionFC4.setRequest(requestFC4);
+        transactionFC3.setRequest(requestFC3);
 
         //Infinite read loop
         int analogAddIndex = 0;
+        int analogOutputAddIndex = 0;
         int requestIndex = 0;
         try {
             transactionFC4.execute();
@@ -118,6 +131,14 @@ public class ModbusTCP {
             BitVector discreteInputs = responseFC2.getDiscretes();
             for(int i = 0; i< discreteInputs.size(); i++){
                 dateFromModbus.add(new FlagData(String.valueOf(offsetFC2 + i), discreteInputs.getBit(i) == true ? "1" : "0"));
+            }
+
+            transactionFC3.execute();
+            responseFC3 = (ReadMultipleRegistersResponse)transactionFC3.getResponse();
+
+            for (InputRegister register : responseFC3.getRegisters()) {
+                dateFromModbus.add(new FlagData(String.valueOf(offsetFC3 + analogOutputAddIndex),String.valueOf(register.getValue())));
+                analogOutputAddIndex++;
             }
 
             requestIndex++;
@@ -341,7 +362,7 @@ public class ModbusTCP {
      * @param serialNumber - Серийный номер устройства
      * @param logicalNumber - Логический номер устройства
      */
-    public void setLogRequest(int serialNumber,int logicalNumber){
+    public void setLogRequest(long serialNumber, int logicalNumber){
         InetAddress connectionAddress = null; //127.0.0.1
         try {
             connectionAddress = InetAddress.getByName(ip);
@@ -369,26 +390,26 @@ public class ModbusTCP {
         commonTransaction = new ModbusTCPTransaction(connection);
         commonTransaction.setRequest(request);
 
-        String fullSerialNumber = "";
+        StringBuilder fullSerialNumber = new StringBuilder();
         try {
             commonTransaction.execute();
             response = (ReadMultipleRegistersResponse)commonTransaction.getResponse();
 
             for (InputRegister register : response.getRegisters()) {
-             fullSerialNumber+= register.getValue();
+                fullSerialNumber.append(register.getValue());
             }
-            int resultSerialNumber = Integer.valueOf(fullSerialNumber,16);
+            long resultSerialNumber = Long.valueOf(fullSerialNumber.toString());
             if(resultSerialNumber == serialNumber)
             {
                 SimpleRegister reg = new SimpleRegister(1);
                 int offsetFC4 = 40003;
                 reg.setValue(logicalNumber);
-                commonRequest = new WriteSingleRegisterRequest(offsetFC4,reg);
+                commonRequest = new WriteSingleRegisterRequest(offsetFC4, reg);
                 commonTransaction = new ModbusTCPTransaction(connection);
                 commonTransaction.setRequest(commonRequest);
                 try {
                     commonTransaction.execute();
-                    commonResponse =  (WriteSingleRegisterResponse) commonTransaction.getResponse();
+                    commonResponse = (WriteSingleRegisterResponse) commonTransaction.getResponse();
                 } catch (ModbusException e) {
                     e.printStackTrace();
                 }
