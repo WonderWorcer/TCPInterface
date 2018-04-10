@@ -1,4 +1,5 @@
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -9,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -35,10 +37,30 @@ public class Controller implements Initializable {
         data.clear();
         ModbusTCP modbusTCP = new ModbusTCP(ipAddress.getText(), Integer.parseInt(port.getText()));
         Vector<FlagData> dataFromModbus = modbusTCP.getModbusData();
-
         for(int i = 0; i < dataFromModbus.size(); i++){
             data.add(dataFromModbus.elementAt(i));
         }
+    }
+
+
+
+
+    public void getSelectedIndex(MouseEvent event){
+        FlagData flagData = tableView.getSelectionModel().getSelectedItem();
+        System.out.println(flagData.getValue());
+        int value = 0;
+        TextInputDialog dialog = new TextInputDialog(flagData.getValue());
+        dialog.setTitle("Edit Cell");
+        dialog.setHeaderText("Look, a Text Input Dialog");
+        dialog.setContentText("Please enter new value:");
+                        // Traditional way to get the response value.
+                       Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            value = Integer.parseInt(result.get());
+            }
+                        ModbusTCP modbusTCP = new ModbusTCP(ipAddress.getText(), Integer.parseInt(port.getText()));
+
+        modbusTCP.changeValue(Integer.parseInt(flagData.getAddress()),value);
     }
 
     public void showSetWindow(ActionEvent event) {

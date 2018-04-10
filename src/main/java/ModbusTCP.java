@@ -425,4 +425,57 @@ public class ModbusTCP {
 
     }
 
+    public void changeValue(int offset, int value){
+        SimpleRegister reg = new SimpleRegister(1);
+        reg.setValue(value);
+
+        InetAddress connectionAddress = null; //127.0.0.1
+        try {
+            connectionAddress = InetAddress.getByName(ip);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        int connectionPort = port; //502
+        try {
+            connection = new TCPMasterConnection(connectionAddress);
+            connection.setPort(connectionPort);
+            connection.connect();
+        } catch (Exception ex) {
+            System.out.println(new StringBuilder("ERROR: Could not establish connection to slave device. Device address: ")
+                    .append(connectionAddress.getHostAddress())
+                    .append(':')
+                    .append(connectionPort));
+            connection.close();
+            return ;
+        }
+        //TS - signals
+        if(offset < 30000 ){
+
+
+        }
+        //TI - signals
+        else if(offset > 30000 && offset < 40000)
+        {
+            WriteSingleRegisterRequest changeRequest = new WriteSingleRegisterRequest(offset,reg);
+            commonTransaction = new ModbusTCPTransaction(connection);
+            commonTransaction.setRequest(commonRequest);
+
+            try {
+                commonTransaction.execute();
+                commonResponse =  (WriteSingleRegisterResponse) commonTransaction.getResponse();
+            } catch (ModbusException e) {
+                e.printStackTrace();
+            }
+
+        }
+        //Common data - still not work
+        else
+        {
+
+
+        }
+
+
+    }
+
 }

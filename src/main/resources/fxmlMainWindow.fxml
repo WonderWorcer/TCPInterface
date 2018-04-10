@@ -21,7 +21,7 @@
                 <Insets />
             </opaqueInsets>
         </Label>
-        <TableView fx:id="tableView" layoutY="109.0" maxHeight="1.7976931348623157E308" prefHeight="491.0" prefWidth="800.0">
+        <TableView fx:id="tableView" layoutY="109.0" maxHeight="1.7976931348623157E308" onMousePressed="#getSelectedIndex" prefHeight="491.0" prefWidth="800.0">
             <columns>
                 <TableColumn prefWidth="270.0" text="Адрес регистра">
                     <cellValueFactory>
