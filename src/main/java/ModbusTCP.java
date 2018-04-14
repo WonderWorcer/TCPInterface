@@ -435,7 +435,7 @@ public class ModbusTCP {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        int connectionPort = port; //502
+        int connectionPort = 503; //502
         try {
             connection = new TCPMasterConnection(connectionAddress);
             connection.setPort(connectionPort);
@@ -450,7 +450,16 @@ public class ModbusTCP {
         }
         //TS - signals
         if(offset < 30000 ){
+            WriteSingleRegisterRequest changeRequest = new WriteSingleRegisterRequest(offset,reg);
+            commonTransaction = new ModbusTCPTransaction(connection);
+            commonTransaction.setRequest(changeRequest);
 
+            try {
+                commonTransaction.execute();
+                //           commonResponse =  (WriteSingleRegisterResponse) commonTransaction.getResponse();
+            } catch (ModbusException e) {
+                e.printStackTrace();
+            }
 
         }
         //TI - signals
@@ -458,11 +467,11 @@ public class ModbusTCP {
         {
             WriteSingleRegisterRequest changeRequest = new WriteSingleRegisterRequest(offset,reg);
             commonTransaction = new ModbusTCPTransaction(connection);
-            commonTransaction.setRequest(commonRequest);
+            commonTransaction.setRequest(changeRequest);
 
             try {
                 commonTransaction.execute();
-                commonResponse =  (WriteSingleRegisterResponse) commonTransaction.getResponse();
+     //           commonResponse =  (WriteSingleRegisterResponse) commonTransaction.getResponse();
             } catch (ModbusException e) {
                 e.printStackTrace();
             }
@@ -471,7 +480,16 @@ public class ModbusTCP {
         //Common data - still not work
         else
         {
+            WriteSingleRegisterRequest changeRequest = new WriteSingleRegisterRequest(offset,reg);
+            commonTransaction = new ModbusTCPTransaction(connection);
+            commonTransaction.setRequest(changeRequest);
 
+            try {
+                commonTransaction.execute();
+                //           commonResponse =  (WriteSingleRegisterResponse) commonTransaction.getResponse();
+            } catch (ModbusException e) {
+                e.printStackTrace();
+            }
 
         }
 
